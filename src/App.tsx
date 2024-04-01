@@ -1,17 +1,44 @@
 import React, { useEffect, useState } from "react";
 import Grid from "@mui/material/Unstable_Grid2";
-import { Select, Typography } from "@mui/material";
+import { Select, Typography, MenuItem} from "@mui/material";
 /**
  * You will find globals from this file useful!
  */
-import {} from "./globals";
+import {BASE_API_URL, TOKEN, MY_BU_ID} from "./globals";
 import { IUniversityClass } from "./types/api_types";
 
 function App() {
   // You will need to use more of these!
   const [currClassId, setCurrClassId] = useState<string>("");
   const [classList, setClassList] = useState<IUniversityClass[]>([]);
+  const [options, setOptions] = useState<IUniversityClass[]>([]);
 
+  useEffect(() => {
+    const fetchStudents = async() => {
+    try {
+      const response = await fetch("https://spark-se-assessment-api.azurewebsites.net/api/class/listBySemester/fall2022?buid=1435265", {
+        method: "GET",
+        headers: {
+          "x-functions-key": TOKEN,
+          "Accept": "application/json",
+        },
+      });
+
+      if(!response.ok){
+        throw new Error("error retrieving data");
+      }
+
+      const result = await response.json();
+      const results = [];
+      
+      setOptions(result);
+      console.log(result);
+    } catch(error){
+      console.error("problem");
+    }
+  };   
+  fetchStudents();
+}, []);
   /**
    * This is JUST an example of how you might fetch some data(with a different API).
    * As you might notice, this does not show up in your console right now.
@@ -47,8 +74,17 @@ function App() {
             Select a class
           </Typography>
           <div style={{ width: "100%" }}>
-            <Select fullWidth={true} label="Class">
-              {/* You'll need to place some code here to generate the list of items in the selection */}
+            <Select fullWidth={true} label="Class"
+            value={currClassId} 
+            onChange={(e) => setCurrClassId(e.target.value)}
+            >
+             {
+                options.map((item) => (
+                  <MenuItem key={item.classId} value={item.classId}>
+                    {item.classId}
+                  </MenuItem>
+                ))
+                }
             </Select>
           </div>
         </Grid>
@@ -56,7 +92,9 @@ function App() {
           <Typography variant="h4" gutterBottom>
             Final Grades
           </Typography>
-          <div>Place the grade table here</div>
+          <div>
+            Place the grade table here
+            </div>
         </Grid>
       </Grid>
     </div>
