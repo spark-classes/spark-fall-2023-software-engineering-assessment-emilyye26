@@ -17,3 +17,11 @@ export interface IUniversityClass {
   status: string;
   semester: string;
 }
+
+export interface IStudent {
+  universityId: string;
+  name: string;
+  dateEnrolled: string;
+  status: string;
+}
+

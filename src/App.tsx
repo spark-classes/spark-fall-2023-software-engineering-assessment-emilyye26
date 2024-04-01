@@ -5,13 +5,13 @@ import { Select, Typography, MenuItem, Table, TableBody, TableCell, TableContain
  * You will find globals from this file useful!
  */
 import {BASE_API_URL, TOKEN, MY_BU_ID} from "./globals";
-import { IUniversityClass } from "./types/api_types";
+import { IUniversityClass, IStudent } from "./types/api_types";
 
 function App() {
   // You will need to use more of these!
   const [currClassId, setCurrClassId] = useState<string>("");
   const [classList, setClassList] = useState<IUniversityClass[]>([]);
-  const [studentList, setStudents] = useState([]);
+  const [studentList, setStudents] = useState<IStudent[]>([]);
 
   useEffect(() => {
     const fetchClasses = async() => {
@@ -24,30 +24,44 @@ function App() {
       });
 
       const result = await response.json();
-      
       setClassList(result);
   };   
   fetchClasses();
 }, []);
 
 useEffect(() => {
-  const fetchStudents = async() => {
-    const response = await fetch("https://spark-se-assessment-api.azurewebsites.net/api/class/listStudents/C129?buid=1435265", {
-    method: "GET",
-    headers: {
-      "x-functions-key": TOKEN,
-      "Accept": "application/json",
-    },
+  const fetchStudents = async () => {
+    const response = await fetch(`https://spark-se-assessment-api.azurewebsites.net/api/class/listStudents/C129?buid=1435265`, {
+      method: "GET",
+      headers: {
+        "x-functions-key": TOKEN,
+        "Accept": "application/json",
+      },
     });
 
-    const result = await response.json();
-  
-    setStudents(result);
-    console.log(result);
-  };   
+    const Ids = await response.json();
 
+    const studentData = [];
+  for (const Id of Ids) {
+      const studentInfo = await fetch(`https://spark-se-assessment-api.azurewebsites.net/api/student/GetById/${Id}?buid=1435265`, {
+      method: "GET",
+      headers: {
+        "x-functions-key": TOKEN,
+        "Accept": "application/json",
+      },
+  });
+  const result = await studentInfo.json();
+  studentData.push(result);
+}
+const flattenedStudentData = studentData.flat(); // Flatten the array
+
+setStudents(flattenedStudentData);
+console.log(flattenedStudentData);
+  };
   fetchStudents();
 }, []);
+
+
 
   /**
    * This is JUST an example of how you might fetch some data(with a different API).
@@ -113,21 +127,25 @@ useEffect(() => {
                   <TableCell>Semester</TableCell>
                   <TableCell>Final Grade</TableCell>
                 </TableRow>
+
               </TableHead>
               <TableBody>
-                {studentList.map((student) => (
-                  <TableRow key={student}>
-                    <TableCell>{student}</TableCell>
-                  </TableRow>
-                ))}
+              {studentList.map((student) => (
+                <TableRow key={student.universityId}>
+                  <TableCell>{student.universityId}</TableCell>
+                  <TableCell>{student.name}</TableCell>
+                  <TableCell>{currClassId}</TableCell>
+                  <TableCell>{currClassId}</TableCell>
+                  <TableCell>Fall 2022</TableCell>
+              <TableCell>{/* final grade*/}</TableCell>
+    </TableRow>
+  ))}
               </TableBody>
             </Table>
           </TableContainer>
           
           <div>
-          {/* {studentList.map((item) => {
-              return(item);
-            })} */}
+         
             Place the grade table here
             
           </div>
