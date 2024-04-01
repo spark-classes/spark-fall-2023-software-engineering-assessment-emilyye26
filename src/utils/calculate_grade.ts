@@ -31,5 +31,34 @@ export async function calculateStudentFinalGrade(
  * @returns Some data structure that has a list of each student and their final grade.
  */
 export async function calcAllFinalGrade(classID: string): Promise<undefined> {
+  const response = await fetch(
+    `https://spark-se-assessment-api.azurewebsites.net/api/class/listStudents/${classID}?buid=1435265`, {
+            method: "GET",
+            headers: {
+            "x-functions-key":
+            "6se7z2q8WGtkxBlXp_YpU-oPq53Av-y_GSYiKyS_COn6AzFuTjj4BQ==",
+            "Accept": "application/json",
+          },
+    });
+    const Ids = await response.json();
+    console.log(Ids);
+
+    const studentData = [];
+    for (const Id of Ids) {
+      const studentInfo = await fetch(`https://spark-se-assessment-api.azurewebsites.net/api/student/listGrades/${Id}/${classID}/?buid=1435265`, {
+        method: "GET",
+        headers: {
+          "x-functions-key": "6se7z2q8WGtkxBlXp_YpU-oPq53Av-y_GSYiKyS_COn6AzFuTjj4BQ==",
+          "Accept": "application/json",
+        },
+      });
+      const result = await studentInfo.json();
+      studentData.push(result);
+    }
+    // console.log(studentData);
+    studentData.map((item) => (
+      console.log(item.grades)
+    ))
+
   return undefined;
 }

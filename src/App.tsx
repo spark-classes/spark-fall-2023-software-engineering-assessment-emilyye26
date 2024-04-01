@@ -6,6 +6,7 @@ import { Select, Typography, MenuItem, Table, TableBody, TableCell, TableContain
  */
 import {BASE_API_URL, TOKEN, MY_BU_ID} from "./globals";
 import { IUniversityClass, IStudent } from "./types/api_types";
+import { calcAllFinalGrade, calculateStudentFinalGrade } from "./utils/calculate_grade";
 
 function App() {
   // You will need to use more of these!
@@ -29,6 +30,8 @@ function App() {
   };   
   fetchClasses();
 }, []);
+
+calcAllFinalGrade("C125");
 
 const fetchClassTitle = (classId: string) => {
   const selectedClass = classList.find((item) => item.classId === classId);
@@ -70,22 +73,22 @@ const fetchClassTitle = (classId: string) => {
           </Typography>
           <div style={{ width: "100%" }}>
           <Select 
-  fullWidth={true} 
-  label="Class"
-  value={currClassId} 
+            fullWidth={true} 
+            label="Class"
+            value={currClassId} 
 
-  onChange={async (e) => {
-    // should look by id not name
-    setCurrClassId(e.target.value);
-    setClassTitle(fetchClassTitle(e.target.value as string));
-
-    console.log(e.target.value);
-    const response = await fetch(`https://spark-se-assessment-api.azurewebsites.net/api/class/listStudents/${e.target.value}?buid=1435265`, {
-      method: "GET",
-      headers: {
-        "x-functions-key": TOKEN,
-        "Accept": "application/json",
-      },
+            onChange={async (e) => {
+              
+            setCurrClassId(e.target.value);
+            setClassTitle(fetchClassTitle(e.target.value as string));
+              /* Fetching a list of students in the class */
+            console.log(e.target.value);
+            const response = await fetch(`https://spark-se-assessment-api.azurewebsites.net/api/class/listStudents/${e.target.value}?buid=1435265`, {
+            method: "GET",
+            headers: {
+            "x-functions-key": TOKEN,
+            "Accept": "application/json",
+          },
     });
     const Ids = await response.json();
     console.log(Ids);
