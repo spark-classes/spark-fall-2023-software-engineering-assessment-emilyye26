@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import Grid from "@mui/material/Unstable_Grid2";
-import { Select, Typography, MenuItem} from "@mui/material";
+import { Select, Typography, MenuItem, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper} from "@mui/material";
 /**
  * You will find globals from this file useful!
  */
@@ -11,11 +11,10 @@ function App() {
   // You will need to use more of these!
   const [currClassId, setCurrClassId] = useState<string>("");
   const [classList, setClassList] = useState<IUniversityClass[]>([]);
-  const [options, setOptions] = useState<IUniversityClass[]>([]);
+  const [studentList, setStudents] = useState([]);
 
   useEffect(() => {
-    const fetchStudents = async() => {
-    try {
+    const fetchClasses = async() => {
       const response = await fetch("https://spark-se-assessment-api.azurewebsites.net/api/class/listBySemester/fall2022?buid=1435265", {
         method: "GET",
         headers: {
@@ -24,21 +23,32 @@ function App() {
         },
       });
 
-      if(!response.ok){
-        throw new Error("error retrieving data");
-      }
-
       const result = await response.json();
-      const results = [];
       
-      setOptions(result);
-      console.log(result);
-    } catch(error){
-      console.error("problem");
-    }
+      setClassList(result);
   };   
+  fetchClasses();
+}, []);
+
+useEffect(() => {
+  const fetchStudents = async() => {
+    const response = await fetch("https://spark-se-assessment-api.azurewebsites.net/api/class/listStudents/C129?buid=1435265", {
+    method: "GET",
+    headers: {
+      "x-functions-key": TOKEN,
+      "Accept": "application/json",
+    },
+    });
+
+    const result = await response.json();
+  
+    setStudents(result);
+    console.log(result);
+  };   
+
   fetchStudents();
 }, []);
+
   /**
    * This is JUST an example of how you might fetch some data(with a different API).
    * As you might notice, this does not show up in your console right now.
@@ -79,12 +89,12 @@ function App() {
             onChange={(e) => setCurrClassId(e.target.value)}
             >
              {
-                options.map((item) => (
-                  <MenuItem key={item.classId} value={item.classId}>
-                    {item.classId}
+                classList.map((item) => (
+                  <MenuItem key={item.title} value={item.title}>
+                    {item.title}
                   </MenuItem>
                 ))
-                }
+              }
             </Select>
           </div>
         </Grid>
@@ -92,9 +102,36 @@ function App() {
           <Typography variant="h4" gutterBottom>
             Final Grades
           </Typography>
+          <TableContainer component={Paper}>
+            <Table>
+              <TableHead>
+                <TableRow>
+                  <TableCell>Student ID</TableCell>
+                  <TableCell>Student Name</TableCell>
+                  <TableCell>Class ID</TableCell>
+                  <TableCell>ClassName</TableCell>
+                  <TableCell>Semester</TableCell>
+                  <TableCell>Final Grade</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {studentList.map((student) => (
+                  <TableRow key={student}>
+                    <TableCell>{student}</TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
+          
           <div>
+          {/* {studentList.map((item) => {
+              return(item);
+            })} */}
             Place the grade table here
-            </div>
+            
+          </div>
+          
         </Grid>
       </Grid>
     </div>
