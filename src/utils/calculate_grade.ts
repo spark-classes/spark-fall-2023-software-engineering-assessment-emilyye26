@@ -72,16 +72,12 @@ export async function calcAllFinalGrade(classID: string): Promise<any[]> {
       const result = await studentInfo.json();
       const grades = result.grades[0];
       const gradeValues = Object.values(grades) as number[];
-    
-      const totalGrade = gradeValues.reduce((total, grade) => total + Number(grade), 0);
-      
-      // console.log(gradeValues[0]);
 
       const weightedAssignments = [];
       for (let i = 0; i < 5; i++) {
         weightedAssignments.push((weights[i]/100) * gradeValues[i])
       }
-      const weightedSum = weightedAssignments.reduce((total, weightedGrade) => total + weightedGrade, 0);
+      const weightedSum = (weightedAssignments.reduce((total, weightedGrade) => total + weightedGrade, 0)).toFixed(2);
     
       result.weightedSum = weightedSum;
       console.log(result);
