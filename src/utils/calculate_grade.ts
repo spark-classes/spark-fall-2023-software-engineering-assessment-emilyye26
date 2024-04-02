@@ -53,12 +53,22 @@ export async function calcAllFinalGrade(classID: string): Promise<undefined> {
         },
       });
       const result = await studentInfo.json();
+      const grades = result.grades[0];
+      const gradeValues = Object.values(grades) as number[];
+    
+      const totalGrade = gradeValues.reduce((total, grade) => total + Number(grade), 0);
+      
+      console.log(gradeValues[0]);
+
+      
       studentData.push(result);
     }
+
+    
     // console.log(studentData);
-    studentData.map((item) => (
-      console.log(item.grades)
-    ))
+    // studentData.map((item) => (
+    //   console.log(item.grades.A1)
+    // ))
 
   return undefined;
 }
