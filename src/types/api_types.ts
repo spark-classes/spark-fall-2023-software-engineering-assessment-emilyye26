@@ -23,5 +23,6 @@ export interface IStudent {
   name: string;
   dateEnrolled: string;
   status: string;
+  weightedSum: number;
 }
 

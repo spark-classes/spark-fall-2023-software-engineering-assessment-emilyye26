@@ -30,7 +30,7 @@ export async function calculateStudentFinalGrade(
  * @param classID The ID of the class for which we want to calculate the final grades
  * @returns Some data structure that has a list of each student and their final grade.
  */
-export async function calcAllFinalGrade(classID: string): Promise<undefined> {
+export async function calcAllFinalGrade(classID: string): Promise<any[]> {
   const response = await fetch(
     `https://spark-se-assessment-api.azurewebsites.net/api/class/listStudents/${classID}?buid=1435265`, {
             method: "GET",
@@ -81,13 +81,11 @@ export async function calcAllFinalGrade(classID: string): Promise<undefined> {
       for (let i = 0; i < 5; i++) {
         weightedAssignments.push((weights[i]/100) * gradeValues[i])
       }
-      const weightedSum= weightedAssignments.reduce((total, weightedGrade) => total + weightedGrade, 0);
+      const weightedSum = weightedAssignments.reduce((total, weightedGrade) => total + weightedGrade, 0);
     
-      console.log(weightedSum);
-
-      
+      result.weightedSum = weightedSum;
+      console.log(result);
       studentData.push(result);
     }
-
-  return undefined;
+  return studentData;
 }

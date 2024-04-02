@@ -14,6 +14,7 @@ function App() {
   const [currClassTitle, setClassTitle] = useState<string>("");
   const [classList, setClassList] = useState<IUniversityClass[]>([]);
   const [studentList, setStudents] = useState<IStudent[]>([]);
+  const [weightGrades, setWeightGrades] = useState<[]>([]);
 
   useEffect(() => {
     const fetchClasses = async() => {
@@ -31,7 +32,7 @@ function App() {
   fetchClasses();
 }, []);
 
-calcAllFinalGrade("C125");
+
 
 const fetchClassTitle = (classId: string) => {
   const selectedClass = classList.find((item) => item.classId === classId);
@@ -72,6 +73,7 @@ const fetchClassTitle = (classId: string) => {
             Select a class
           </Typography>
           <div style={{ width: "100%" }}>
+          
           <Select 
             fullWidth={true} 
             label="Class"
@@ -84,30 +86,36 @@ const fetchClassTitle = (classId: string) => {
               /* Fetching a list of students in the class */
             console.log(e.target.value);
             const response = await fetch(`https://spark-se-assessment-api.azurewebsites.net/api/class/listStudents/${e.target.value}?buid=1435265`, {
-            method: "GET",
-            headers: {
-            "x-functions-key": TOKEN,
-            "Accept": "application/json",
-          },
-    });
+              method: "GET",
+              headers: {
+              "x-functions-key": TOKEN,
+              "Accept": "application/json",
+            },
+          });
     const Ids = await response.json();
     console.log(Ids);
+    const weightedStudents = await calcAllFinalGrade(e.target.value as string);
+
     const studentData = [];
-    for (const Id of Ids) {
-      const studentInfo = await fetch(`https://spark-se-assessment-api.azurewebsites.net/api/student/GetById/${Id}?buid=1435265`, {
-        method: "GET",
-        headers: {
-          "x-functions-key": TOKEN,
-          "Accept": "application/json",
-        },
-      });
-      const result = await studentInfo.json();
-      studentData.push(result);
-    }
+for (const Id of Ids) {
+  const studentInfo = await fetch(`https://spark-se-assessment-api.azurewebsites.net/api/student/GetById/${Id}?buid=1435265`, {
+    method: "GET",
+    headers: {
+      "x-functions-key": TOKEN,
+      "Accept": "application/json",
+    },
+  });
+  const result = await studentInfo.json();
+  studentData.push(result);
+}
 
-    const flattenedStudentData = studentData.flat(); // Flatten the array
-
-    setStudents(flattenedStudentData);
+  const flatStudentData = studentData.map((student, index) => ({
+    ...student,
+    weightedSum: weightedStudents[index].weightedSum,
+    name: weightedStudents[index].name,
+    universityId: weightedStudents[index].studentId
+  }));
+  setStudents(flatStudentData);
   }}
 >
   {
@@ -117,6 +125,8 @@ const fetchClassTitle = (classId: string) => {
       </MenuItem>
     ))
   }
+
+
 </Select>
 
           </div>
@@ -146,7 +156,7 @@ const fetchClassTitle = (classId: string) => {
                   <TableCell>{currClassId}</TableCell>
                   <TableCell>{currClassTitle}</TableCell>
                   <TableCell>Fall 2022</TableCell>
-              <TableCell>{/* final grade*/}</TableCell>
+                  <TableCell>{student.weightedSum}</TableCell>
     </TableRow>
   ))}
               </TableBody>
