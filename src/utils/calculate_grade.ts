@@ -41,7 +41,24 @@ export async function calcAllFinalGrade(classID: string): Promise<undefined> {
           },
     });
     const Ids = await response.json();
-    console.log(Ids);
+    // console.log(Ids);
+    
+    const assignmentFetch = await fetch(
+      `https://spark-se-assessment-api.azurewebsites.net/api/class/listAssignments/${classID}?buid=1435265`, {
+              method: "GET",
+              headers: {
+              "x-functions-key":
+              "6se7z2q8WGtkxBlXp_YpU-oPq53Av-y_GSYiKyS_COn6AzFuTjj4BQ==",
+              "Accept": "application/json",
+            },
+      });
+      const assignments = await assignmentFetch.json();
+      const weights = [];
+      /* Record weights of all assignments */
+      for (let i = 0; i < 5; i++) {
+        const as = assignments[i];
+        weights.push(as.weight);
+      }
 
     const studentData = [];
     for (const Id of Ids) {
@@ -58,17 +75,19 @@ export async function calcAllFinalGrade(classID: string): Promise<undefined> {
     
       const totalGrade = gradeValues.reduce((total, grade) => total + Number(grade), 0);
       
-      console.log(gradeValues[0]);
+      // console.log(gradeValues[0]);
+
+      const weightedAssignments = [];
+      for (let i = 0; i < 5; i++) {
+        weightedAssignments.push((weights[i]/100) * gradeValues[i])
+      }
+      const weightedSum= weightedAssignments.reduce((total, weightedGrade) => total + weightedGrade, 0);
+    
+      console.log(weightedSum);
 
       
       studentData.push(result);
     }
-
-    
-    // console.log(studentData);
-    // studentData.map((item) => (
-    //   console.log(item.grades.A1)
-    // ))
 
   return undefined;
 }
