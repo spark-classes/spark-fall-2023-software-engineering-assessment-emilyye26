@@ -33,7 +33,7 @@ function App() {
   fetchClasses();
 }, []);
 
-// function to fetch the class title when given the class id
+// Function to fetch the class title when given the class id
 const fetchClassTitle = (classId: string) => {
   const selectedClass = classList.find((item) => item.classId === classId);
   return selectedClass ? selectedClass.title : "";
@@ -87,28 +87,28 @@ const fetchClassTitle = (classId: string) => {
                 const result = await studentInfo.json();
                 studentData.push(result); 
             }
+            // Retrieves student information along with the calculated final grade
             const weightedStudents = await calcAllFinalGrade(e.target.value as string);
-  const flatStudentData = studentData.map((student, index) => ({
-    ...student,
-    weightedSum: weightedStudents[index].weightedSum,
-    name: weightedStudents[index].name,
-    universityId: weightedStudents[index].studentId
-  }));
-  setStudents(flatStudentData);
+            const data = studentData.map((student, index) => ({
+              ...student,
+              weightedSum: weightedStudents[index].weightedSum,
+              name: weightedStudents[index].name,
+              universityId: weightedStudents[index].studentId
+            }));
+          // Sets the data that will appear in the table
+          setStudents(data);
   }}
 >
   {
+    // Sets options for the drop-down menu
     classList.map((item) => (
       <MenuItem key={item.title} value={item.classId}>
         {item.title}
       </MenuItem>
     ))
   }
-
-
 </Select>
-
-          </div>
+</div>
         </Grid>
         <Grid xs={12} md={8}>
           <Typography variant="h4" gutterBottom>
@@ -137,7 +137,7 @@ const fetchClassTitle = (classId: string) => {
                   <TableCell>Fall 2022</TableCell>
                   <TableCell>{student.weightedSum}</TableCell>
     </TableRow>
-  ))}
+              ))}
               </TableBody>
             </Table>
           </TableContainer>
