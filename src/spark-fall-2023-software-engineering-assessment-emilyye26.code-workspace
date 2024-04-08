@@ -1,0 +1,13 @@
+{
+  "folders": [
+    {
+      "path": "../../../../github-classroom/spark-classes/spark-fall-2023-software-engineering-assessment-emilyye26"
+    },
+    {
+      "path": "../.."
+    }
+  ],
+  "settings": {
+    "githubPullRequests.ignoredPullRequestBranches": ["main"]
+  }
+}
